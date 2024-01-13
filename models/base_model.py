@@ -1,24 +1,19 @@
 #!/usr/bin/python3
-"""
-Module: base.py
-"""
-import models
-import uuid
+"""This a module  base.py"""
 from datetime import datetime
+import uuid
+import models
 
 
-class BaseModel():
+class BaseModel:
     """
-    Base class which defines all common
-    attributes/methods for other classes
+    It defines attributes or methods that are common
+    to other classes
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        instatiates an object with it's
-        attributes
-        """
-        if len(kwargs) > 0:
+        """Instantiates an object with its attributes."""
+        if len(kwargs) != 0:
             for key, value in kwargs.items():
                 if key == '__class__':
                     continue
@@ -27,33 +22,28 @@ class BaseModel():
                 setattr(self, key, value)
             return
 
+
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
 
         models.storage.new(self)
 
     def __str__(self):
         """
-        Returns the string representation
+        Gives out a string representation
         of the instance
         """
         return "[{}] ({}) {}".format(
             type(self).__name__, self.id, self.__dict__)
 
     def save(self):
-        """
-        updates the public instance attribute
-        updated_at with the current datetime
-        """
+        """It updates public instance attributes"""
         self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
-        """
-        returns a dictionary containing all keys/values
-        of __dict__ of the instance
-        """
+        """Gives a dictionary derived from __dict__"""
         dict = {**self.__dict__}
         dict['__class__'] = type(self).__name__
         dict['created_at'] = dict['created_at'].isoformat()
