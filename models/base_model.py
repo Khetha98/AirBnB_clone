@@ -44,11 +44,13 @@ class BaseModel:
 
     def to_dict(self):
         """Gives a dictionary derived from __dict__"""
-        map_obje = {}
-        for key, value in self.__dict__.items():
-            if key == "created_at" or key == "updated_at":
-                map_obje[key] = value.isoformat()
-            else:
-                map_obje[key] = value
-        map_obje["__class__"] = self.__class__.__name__
-        return map_obje
+        map_obj = self.__dict__.copy()
+        
+        # Convert created_at and updated_at to string object in ISO format
+        map_obj['created_at'] = self.created_at.isoformat()
+        map_obj['updated_at'] = self.updated_at.isoformat()
+
+        # Add the class name to the dictionary
+        map_obj['__class__'] = self.__class__.__name__
+        
+        return map_obj
