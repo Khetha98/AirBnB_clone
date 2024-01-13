@@ -1,24 +1,19 @@
 #!/usr/bin/python3
-"""
-Module is  base.py
-"""
-import models
-import uuid
+"""This a module  base.py"""
 from datetime import datetime
+import uuid
+import models
 
 
-class BaseModel():
+class BaseModel:
     """
-    Base class which defines all common
-    attributes or
+    It defines attributes or methods that are common
+    to other classes
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        instatiates the object with it's
-        attributes
-        """
-        if len(kwargs) > 0:
+        """Instantiates an object with its attributes."""
+        if len(kwargs) != 0:
             for key, value in kwargs.items():
                 if key == '__class__':
                     continue
@@ -26,6 +21,7 @@ class BaseModel():
                     value = datetime.fromisoformat(value)
                 setattr(self, key, value)
             return
+
 
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
@@ -35,28 +31,24 @@ class BaseModel():
 
     def __str__(self):
         """
-        Returns a string representation
-        of an instance
+        Gives out a string representation
+        of the instance
         """
         return "[{}] ({}) {}".format(
             type(self).__name__, self.id, self.__dict__)
 
     def save(self):
-        """
-        updates public instance attribute
-        updated_at with the current datetime
-        """
+        """It updates public instance attributes"""
         self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
-        """
-        returns the dictionary containing all keys/values
-        of __dict__ of the instance
-        """
-        dict = {**self.__dict__}
-        dict['__class__'] = type(self).__name__
-        dict['created_at'] = dict['created_at'].isoformat()
-        dict['updated_at'] = dict['updated_at'].isoformat()
-
-        return dict
+        """Gives a dictionary derived from __dict__"""
+        map_obje = {}
+        for key, value in self.__dict__.items():
+            if key == "created_at" or key == "updated_at":
+                map_obje[key] = value.isoformat()
+            else:
+                map_obje[key] = value
+        map_obje["__class__"] = self.__class__.__name__
+        return map_obje
