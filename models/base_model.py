@@ -45,12 +45,7 @@ class BaseModel:
     def to_dict(self):
         """Gives a dictionary derived from __dict__"""
         map_obj = self.__dict__.copy()
-        
-        # Convert created_at and updated_at to string object in ISO format
         map_obj['created_at'] = self.created_at.isoformat()
         map_obj['updated_at'] = self.updated_at.isoformat()
-
-        # Add the class name to the dictionary
         map_obj['__class__'] = self.__class__.__name__
-        
         return map_obj
