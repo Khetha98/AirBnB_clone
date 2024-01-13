@@ -1,5 +1,9 @@
 #!/usr/bin/python3
+"""_
+Module: file_storage.py
 
+has a FileStorage class
+"""
 import json
 from models.base_model import BaseModel
 from models.user import User
@@ -10,7 +14,10 @@ from models.place import Place
 from models.review import Review
 import os
 
+
 class FileStorage:
+    """Serializes and deserializes JSOM file to instances"""
+
     __file_path = "file.json"
     __objects = {}
 
