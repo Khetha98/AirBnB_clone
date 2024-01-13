@@ -28,12 +28,14 @@ class BaseModel:
         self.updated_at = datetime.now()
 
         models.storage.new(self)
+
     def __str__(self):
         """
         Gives out a string representation
         of the instance
         """
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(
+            type(self).__name__, self.id, self.__dict__)
 
     def save(self):
         """It updates public instance attributes"""
