@@ -1,8 +1,24 @@
 #!/usr/bin/python3
-
+"""
+Defines Place() class that inherits from
+BaseModel() class
+"""
 from models.base_model import BaseModel
 
 class Place(BaseModel):
+    """It a place
+
+    Attributes:
+        name
+        user_id
+        city_id
+        description
+        number_rooms
+        longitude
+        latitude
+        max_guest
+        amenity_ids
+    """
 
     name = ""
     user_id = ""
