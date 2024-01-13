@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+"""This module console.py is an entry point"""
 import cmd
 import re
 import json
@@ -17,42 +17,13 @@ model_classes = {'BaseModel': BaseModel, 'User': User,
                    'Place': Place, 'Review': Review}
 
 
-current_cls = {'BaseModel': BaseModel}
-
 
 class HBNBCommand(cmd.Cmd):
+    
+    """This is command interpreter class"""
+    
     prompt = "(hbnb) "
-    valid_classes = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]
-
-
-
-    def do_quit(self, arg):
-        """
-        Quit command to exit the program.
-        """
-        raise SystemExit
-
-    def do_EOF(self, arg):
-        """
-        Exits the program on EOF (Ctrl+D).
-        """
-        print("")
-        return True
-
-    def do_emptyline(self):
-        """
-        Do nothing on an empty line
-        """
-        pass
-
-
-    def do_help(self, arg):
-        """
-        Displays help information about the available commands.
-        """
-        super().do_help(arg)
-
-
+    
     def precmd(self, line):
         """
         Override precmd to always display the help message before each command.
@@ -92,22 +63,47 @@ class HBNBCommand(cmd.Cmd):
                     re.sub("[\"\']", "", args[0]),
                     re.sub("[\"\']", "", args[1]), args[2])
 
+
+    def do_quit(self, arg):
+        """
+        Quit command to exit the program.
+        """
+        return True
+
+    def do_EOF(self, arg):
+        """
+        Exits the program on EOF (Ctrl+D).
+        """
+        print("")
+        return True
+
+    def emptyline(self):
+        """
+        Do nothing on an empty line
+        """
+        pass
+
+
+    def do_help(self, arg):
+        """
+        Displays help information about the available commands.
+        """
+        return super().do_help(arg)
+
+
+
     def do_create(self, arg):
         """
         Creates a new instance of BaseModel, saves it, and prints the id.
         Usage: create <class name>
         """
-        if not arg:
-            print("** class name missing **")
+        args = arg.split()
+        if not validate_the_classname(args):
             return
 
-        if arg not in self.valid_classes:
-            print("** class doesn't exist **")
-            return
-
-        new_instance = eval(arg)()
-        new_instance.save()
-        print(new_instance.id)
+        new_obj = model_classes[args[0]]()
+        new_obj.save()
+        print(new_obj.id)
 
     def do_show(self, arg):
         """
@@ -115,15 +111,16 @@ class HBNBCommand(cmd.Cmd):
         Usage: show <class name> <id>
         """
         args = arg.split()
-        if not args or len(args) == 1:
-            print("** class name missing **")
+        if not validate_the_classname(args, check_id=True):
             return
-        elif args[0] not in self.valid_classes:
-            print("** class doesn't exist **")
+
+        instance_objs = storage.all()
+        key = "{}.{}".format(args[0], args[1])
+        req_instance = instance_objs.get(key, None)
+        if req_instance is None:
+            print("** no instance found **")
             return
-        elif len(args) == 2:
-            print("** instance id missing **")
-            return
+        print(req_instance)
 
         obj_key = args[0] + "." + args[1]
         if obj_key in storage.all():
@@ -138,22 +135,18 @@ class HBNBCommand(cmd.Cmd):
         Usage: destroy <class name> <id>
         """
         args = arg.split()
-        if not args or len(args) == 1:
-            print("** class name missing **")
-            return
-        elif args[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-            return
-        elif len(args) == 2:
-            print("** instance id missing **")
+        if not validate_the_classname(args, check_id=True):
             return
 
-        obj_key = args[0] + "." + args[1]
-        if obj_key in storage.all():
-            del storage.all()[obj_key]
-            storage.save()
-        else:
+        instance_objs = storage.all()
+        key = "{}.{}".format(args[0], args[1])
+        req_instance = instance_objs.get(key, None)
+        if req_instance is None:
             print("** no instance found **")
+            return
+
+        del instance_objs[key]
+        storage.save()
 
 
     def do_all(self, arg):
@@ -161,16 +154,19 @@ class HBNBCommand(cmd.Cmd):
         Prints all string representation of all instances based or not on the class name.
         Usage: all [optional: <class name>]
         """
-        objects = storage.all()
-        if arg and arg not in self.valid_classes:
+        args = arg.split()
+        all_objs = storage.all()
+
+        if len(args) < 1:
+            print(["{}".format(str(v)) for _, v in all_objs.items()])
+            return
+        if args[0] not in model_classes.keys():
             print("** class doesn't exist **")
             return
-
-        result = []
-        for key, value in objects.items():
-            if not arg or key.split(".")[0] == arg:
-                result.append(value)
-        print(result)
+        else:
+            print(["{}".format(str(v))
+                  for _, v in all_objs.items() if type(v).__name__ == args[0]])
+            return
 
     def do_update(self, arg):
         """
@@ -234,17 +230,6 @@ def valid_attrs(args):
         return False
     return True
 
-def parsed_str(arg):
-    """Parse `arg` to an `int`, `float` or `string`.
-    """
-    parsed = re.sub("\"", "", arg)
-
-    if is_an_int(parsed):
-        return int(parsed)
-    elif is_a_float(parsed):
-        return float(parsed)
-    else:
-        return arg
 
 def is_a_float(x):
     """Checks if parameter is float.
@@ -256,7 +241,7 @@ def is_a_float(x):
     else:
         return True   
 
-def is_int(x):
+def is_an_int(x):
     """Checks if parameter is an int.
     """
     try:
@@ -266,6 +251,18 @@ def is_int(x):
         return False
     else:
         return a == b
+
+def parsed_str(arg):
+    """Parse `arg` to an `int`, `float` or `string`.
+    """
+    parsed = re.sub("\"", "", arg)
+
+    if is_an_int(parsed):
+        return int(parsed)
+    elif is_a_float(parsed):
+        return float(parsed)
+    else:
+        return arg
 
 
 if __name__ == '__main__':
