@@ -1,19 +1,24 @@
 #!/usr/bin/python3
-"""This a module  base.py"""
-from datetime import datetime
-import uuid
+"""
+Module is  base.py
+"""
 import models
+import uuid
+from datetime import datetime
 
 
-class BaseModel:
+class BaseModel():
     """
-    It defines attributes or methods that are common
-    to other classes
+    Base class which defines all common
+    attributes or
     """
 
     def __init__(self, *args, **kwargs):
-        """Instantiates an object with its attributes."""
-        if len(kwargs) != 0:
+        """
+        instatiates the object with it's
+        attributes
+        """
+        if len(kwargs) > 0:
             for key, value in kwargs.items():
                 if key == '__class__':
                     continue
@@ -21,7 +26,6 @@ class BaseModel:
                     value = datetime.fromisoformat(value)
                 setattr(self, key, value)
             return
-
 
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
@@ -31,21 +35,28 @@ class BaseModel:
 
     def __str__(self):
         """
-        Gives out a string representation
-        of the instance
+        Returns a string representation
+        of an instance
         """
         return "[{}] ({}) {}".format(
             type(self).__name__, self.id, self.__dict__)
 
     def save(self):
-        """It updates public instance attributes"""
+        """
+        updates public instance attribute
+        updated_at with the current datetime
+        """
         self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
-        """Gives a dictionary derived from __dict__"""
-        instance_dictionay = self.__dict__.copy()
-        instance_dictionay['created_at'] = self.created_at.isoformat()
-        instance_dictionay['updated_at'] = self.updated_at.isoformat()
-        instance_dictionay['__class__'] = self.__class__.__name__
-        return instance_dictionay
+        """
+        returns the dictionary containing all keys/values
+        of __dict__ of the instance
+        """
+        dict = {**self.__dict__}
+        dict['__class__'] = type(self).__name__
+        dict['created_at'] = dict['created_at'].isoformat()
+        dict['updated_at'] = dict['updated_at'].isoformat()
+
+        return dict
