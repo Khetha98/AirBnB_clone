@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Unit tests for the `city` module.
+"""Unittests for the city module.
 """
 import os
 import unittest
@@ -8,52 +8,52 @@ from models import storage
 from models.city import City
 from datetime import datetime
 
-c1 = City()
-c2 = City(**c1.to_dict())
-c3 = City("hello", "wait", "in")
+b1 = City()
+b2 = City(**b1.to_dict())
+b3 = City("hello", "wait", "in")
 
 
 class TestCity(unittest.TestCase):
-    """Test cases for the `City` class."""
+    """The test cases for the City class."""
 
     def setUp(self):
         pass
 
     def tearDown(self) -> None:
-        """Resets FileStorage data."""
+        """It resets the FileStorage data."""
         FileStorage._FileStorage__objects = {}
         if os.path.exists(FileStorage._FileStorage__file_path):
             os.remove(FileStorage._FileStorage__file_path)
 
     def test_params(self):
-        """Test method for class attributes"""
-        k = f"{type(c1).__name__}.{c1.id}"
-        self.assertIsInstance(c1.name, str)
-        self.assertEqual(c3.name, "")
-        c1.name = "Abuja"
-        self.assertEqual(c1.name, "Abuja")
+        """It test method for class attributes"""
+        k = f"{type(b1).__name__}.{b1.id}"
+        self.assertIsInstance(b1.name, str)
+        self.assertEqual(b3.name, "")
+        b1.name = "Durban"
+        self.assertEqual(b1.name, "Durban")
 
     def test_init(self):
-        """Test method for public instances"""
-        self.assertIsInstance(c1.id, str)
-        self.assertIsInstance(c1.created_at, datetime)
-        self.assertIsInstance(c1.updated_at, datetime)
-        self.assertEqual(c1.updated_at, c2.updated_at)
+        """It test method for public instances"""
+        self.assertIsInstance(b1.id, str)
+        self.assertIsInstance(b1.created_at, datetime)
+        self.assertIsInstance(b1.updated_at, datetime)
+        self.assertEqual(b1.updated_at, b2.updated_at)
 
     def test_save(self):
-        """Test method for save"""
-        old_update = c1.updated_at
-        c1.save()
-        self.assertNotEqual(c1.updated_at, old_update)
+        """It test method for save"""
+        old_update = b1.updated_at
+        b1.save()
+        self.assertNotEqual(b1.updated_at, old_update)
 
     def test_todict(self):
-        """Test method for dict"""
-        a_dict = c2.to_dict()
+        """It test method for dict"""
+        a_dict = b2.to_dict()
         self.assertIsInstance(a_dict, dict)
-        self.assertEqual(a_dict['__class__'], type(c2).__name__)
+        self.assertEqual(a_dict['__class__'], type(b2).__name__)
         self.assertIn('created_at', a_dict.keys())
         self.assertIn('updated_at', a_dict.keys())
-        self.assertNotEqual(c1, c2)
+        self.assertNotEqual(b1, b2)
 
 
 if __name__ == "__main__":

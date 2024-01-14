@@ -13,6 +13,7 @@ from models.review import Review
 from models.amenity import Amenity
 from models.place import Place
 
+
 current_classes = {'BaseModel': BaseModel, 'User': User,
                    'Amenity': Amenity, 'City': City, 'State': State,
                    'Place': Place, 'Review': Review}
@@ -32,8 +33,8 @@ class HBNBCommand(cmd.Cmd):
         if not line:
             return '\n'
 
-        pattern = re.compile(r"(\w+)\.(\w+)\((.*)\)")
-        match_list = pattern.findall(line)
+        p = re.compile(r"(\w+)\.(\w+)\((.*)\)")
+        match_list = p.findall(line)
         if not match_list:
             return super().precmd(line)
 
@@ -93,9 +94,9 @@ class HBNBCommand(cmd.Cmd):
         if not validate_classname(args):
             return
 
-        new_obj = current_classes[args[0]]()
-        new_obj.save()
-        print(new_obj.id)
+        obj = current_classes[args[0]]()
+        obj.save()
+        print(obj.id)
 
     def do_show(self, arg):
         """It prints the string representation of the instance.
@@ -119,14 +120,14 @@ class HBNBCommand(cmd.Cmd):
         if not validate_classname(args, check_id=True):
             return
 
-        instance_objs = storage.all()
+        objs = storage.all()
         key = "{}.{}".format(args[0], args[1])
-        req_instance = instance_objs.get(key, None)
+        req_instance = objs.get(key, None)
         if req_instance is None:
             print("** no instance found **")
             return
 
-        del instance_objs[key]
+        del objs[key]
         storage.save()
 
     def do_all(self, arg):
@@ -153,9 +154,9 @@ class HBNBCommand(cmd.Cmd):
         if not validate_classname(args, check_id=True):
             return
 
-        instance_objs = storage.all()
+        objs = storage.all()
         key = "{}.{}".format(args[0], args[1])
-        req_instance = instance_objs.get(key, None)
+        req_instance = objs.get(key, None)
         if req_instance is None:
             print("** no instance found **")
             return

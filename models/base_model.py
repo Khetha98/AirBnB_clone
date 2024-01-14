@@ -14,12 +14,12 @@ class BaseModel:
     def __init__(self, *args, **kwargs):
         """Instantiates an object with its attributes."""
         if len(kwargs) != 0:
-            for key, value in kwargs.items():
-                if key == '__class__':
+            for k, v in kwargs.items():
+                if k == '__class__':
                     continue
-                if key == "created_at" or key == "updated_at":
-                    value = datetime.fromisoformat(value)
-                setattr(self, key, value)
+                if k == "created_at" or k == "updated_at":
+                    v = datetime.fromisoformat(v)
+                setattr(self, k, v)
             return
 
 

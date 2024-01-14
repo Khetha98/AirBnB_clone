@@ -38,7 +38,7 @@ class FileStorage:
 
     def reload(self):
         """Deserializes the JSON file to __objects."""
-        current_classes = {'BaseModel': BaseModel, 'User': User,
+        model_classes = {'BaseModel': BaseModel, 'User': User,
                            'Amenity': Amenity, 'City': City, 'State': State,
                            'Place': Place, 'Review': Review}
 
@@ -57,5 +57,5 @@ class FileStorage:
                 return
 
             FileStorage.__objects = {
-                k: current_classes[k.split('.')[0]](**v)
+                k: model_classes[k.split('.')[0]](**v)
                 for k, v in deserialized.items()}
